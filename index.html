@@ -87,31 +87,36 @@ async function copyText(txt,btn,type,x){
  }catch(e){openEditor(x?x.title:"À copier",txt,type,x)}
 }
 function openEditor(title,txt,type,x){
+ const editor=document.getElementById("editor");
+ const saveBtn=document.getElementById("saveCustom");
  document.getElementById("editTitle").textContent=title;
- document.getElementById("editor").value=txt;
+ editor.value=txt;
+ editor.readOnly=type!=="com";
+ saveBtn.style.display=type==="com"?"":"none";
  document.getElementById("editModal").classList.add("open");
- document.getElementById("copyEdited").onclick=e=>copyText(document.getElementById("editor").value,e.target,type,x);
- document.getElementById("saveCustom").onclick=()=>{
-   const body=document.getElementById("editor").value;
+ document.getElementById("copyEdited").onclick=e=>copyText(editor.value,e.target,type,x);
+ saveBtn.onclick=()=>{
+   const body=editor.value;
    custom.push({theme:(x&&x.theme)||"Mails",title:title+" - personnalisé",content:body,source:"personnalisé"});
    save();document.getElementById("editModal").classList.remove("open");render();
  };
 }
 function toggleFav(type,x){let k=key(type,x);fav.has(k)?fav.delete(k):fav.add(k);save();render()}
 function card(type,x){
- const k=key(type,x);
+ const k=key(type,x),isCom=type==="com";
  return `<article class=item><div class=itemhead><h3>${esc(x.title)}</h3><span class=tag>${esc(x.theme)}</span></div>
- <div class=pre>${esc(x.content)}</div><div class=actions>
- <button class="btn primary" onclick='copyFrom(${JSON.stringify(type)},${JSON.stringify(x.title)},this)'>Copier</button>
- ${type==="com"?`<button class=btn onclick='editFrom(${JSON.stringify(x.title)})'>Modifier</button>`:""}
- <button class="btn star" onclick='favFrom(${JSON.stringify(type)},${JSON.stringify(x.title)})'>${fav.has(k)?"★":"☆"}</button>
+ ${isCom?`<p class=cardhint>Prêt à ouvrir, copier ou personnaliser.</p>`:`<div class=pre>${esc(x.content)}</div>`}
+ <div class=actions>
+ <button class="btn primary" onclick='openFrom(${JSON.stringify(type)},${JSON.stringify(x.title)})'>Ouvrir</button>
+ <button class=btn onclick='copyFrom(${JSON.stringify(type)},${JSON.stringify(x.title)},this)'>Copier</button>
+ <button class="btn star" aria-label="Favori" onclick='favFrom(${JSON.stringify(type)},${JSON.stringify(x.title)})'>${fav.has(k)?"★":"☆"}</button>
  </div></article>`;
 }
 function findItem(type,title){
  let arr=type==="com"?allComms():DATA.scripts; return arr.find(x=>x.title===title);
 }
 window.copyFrom=(type,title,btn)=>{let x=findItem(type,title);if(x)copyText(x.content,btn,type,x)}
-window.editFrom=(title)=>{let x=findItem("com",title);if(x){setRecent("com",x);openEditor(x.title,x.content,"com",x)}}
+window.openFrom=(type,title)=>{let x=findItem(type,title);if(x){setRecent(type,x);openEditor(x.title,x.content,type,x)}}
 window.favFrom=(type,title)=>{let x=findItem(type,title);if(x)toggleFav(type,x)}
 function themeGrid(type){
  const arr=type==="com"?allComms():DATA.scripts;
