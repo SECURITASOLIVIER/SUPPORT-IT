@@ -121,9 +121,9 @@ window.favFrom=(type,title)=>{let x=findItem(type,title);if(x)toggleFav(type,x)}
 function themeGrid(type){
  const arr=type==="com"?allComms():DATA.scripts;
  const themes=type==="com"?DATA.commThemes:DATA.scriptThemes;
- return `<div class=sectionTitle><h2>${type==="com"?"Thèmes de communication":"Thématiques scripts & commandes"}</h2></div>
- <div class=themes>${themes.filter(t=>counts(arr,t)>0).map(t=>`<button class=theme onclick='openTheme(${JSON.stringify(type)},${JSON.stringify(t)})'><b>${esc(t)}</b><span>${type==="com"?"Templates prêts à copier":"Commandes & scripts"}</span><span class=count>${counts(arr,t)} élément(s)</span></button>`).join("")}</div>
- ${type==="com"?`<div class=sectionTitle><button class="btn primary" onclick="openNew()">＋ Nouveau template</button></div>`:""}`;
+ return `<div class=sectionTitle><h2>${type==="com"?"Communications":"Scripts & commandes"}</h2></div>
+ <div class=themes>${themes.filter(t=>counts(arr,t)>0).map(t=>`<button class=theme onclick='openTheme(${JSON.stringify(type)},${JSON.stringify(t)})'><b>${esc(t)}</b><span class=count>${counts(arr,t)} ${type==="com"?"template(s)":"commande(s)"}</span></button>`).join("")}</div>
+ ${type==="com"?`<div class=sectionTitle><button class="btn primary" onclick="openNew()">＋ Nouveau</button></div>`:""}`;
 }
 window.openTheme=(type,theme)=>{state.view=type==="com"?"communications":"scripts";state.theme=theme;render()}
 window.openNew=()=>{
@@ -138,11 +138,11 @@ function listView(type){
 }
 window.backThemes=()=>{state.theme=null;render()}
 function home(){
- return `<div class=sectionTitle><h2>Centres mobiles</h2></div><div class=homegrid>
- <button class=homecard onclick="setView('communications')"><span class=icon>✉</span><b>Communications</b><p>${allComms().length} templates classés par thème.</p></button>
- <button class=homecard onclick="setView('scripts')"><span class=icon>⌨</span><b>Scripts & commandes</b><p>${DATA.scripts.length} commandes classées comme dans l'outil Windows.</p></button>
- <button class=homecard onclick="setView('favorites')"><span class=icon>★</span><b>Favoris</b><p>Retrouver les éléments utilisés le plus souvent.</p></button>
- <button class=homecard onclick="setView('recent')"><span class=icon>↻</span><b>Récents</b><p>Historique local des dernières copies.</p></button>
+ return `<div class=sectionTitle><h2>Accès rapide</h2></div><div class=homegrid>
+ <button class=homecard onclick="setView('communications')"><span class=icon>✉</span><b>Communications</b><p>Messages prêts à l'emploi.</p><span class=meta>${allComms().length} templates</span></button>
+ <button class=homecard onclick="setView('scripts')"><span class=icon>⌘</span><b>Scripts</b><p>Diagnostic et support Windows.</p><span class=meta>${DATA.scripts.length} commandes</span></button>
+ <button class=homecard onclick="setView('favorites')"><span class=icon>★</span><b>Favoris</b><p>Retrouver l'essentiel.</p><span class=meta>${fav.size} enregistré(s)</span></button>
+ <button class=homecard onclick="setView('recent')"><span class=icon>↻</span><b>Récents</b><p>Reprendre rapidement.</p><span class=meta>${recent.length} récent(s)</span></button>
  </div>`;
 }
 function searchAll(q){
@@ -167,9 +167,9 @@ function render(){
  if(state.q){
    let rows=searchAll(state.q);title.textContent="Recherche";sub.textContent=`${rows.length} résultat(s) dans les communications et scripts.`;
    html=`<div class=sectionTitle><h2>Résultats</h2></div><div class=list>${rows.length?rows.map(([t,x])=>card(t,x)).join(""):`<div class=empty>Aucun résultat.</div>`}</div>`;
- } else if(state.view==="home"){title.textContent="Accueil";sub.textContent="Communications, templates, commandes et scripts pour le support IT.";html=home()}
- else if(state.view==="communications"){title.textContent="Communications";sub.textContent="Choisis d'abord un thème, puis le template à copier ou personnaliser.";html=listView("com")}
- else if(state.view==="scripts"){title.textContent="Scripts & commandes";sub.textContent="Choisis la thématique puis la commande à utiliser sur le poste Windows.";html=listView("script")}
+ } else if(state.view==="home"){title.textContent="IT Pocket";sub.textContent="Le nécessaire du technicien, immédiatement.";html=home()}
+ else if(state.view==="communications"){title.textContent="Communications";sub.textContent="Choisis un thème, puis ouvre ou copie le message.";html=listView("com")}
+ else if(state.view==="scripts"){title.textContent="Scripts";sub.textContent="Choisis un thème, puis ouvre ou copie la commande.";html=listView("script")}
  else if(state.view==="favorites"){title.textContent="Favoris";sub.textContent="Tes éléments enregistrés sur cet appareil.";html=special("favorites")}
  else if(state.view==="recent"){title.textContent="Récents";sub.textContent="Derniers éléments copiés sur cet appareil.";html=special("recent")}
  document.getElementById("content").innerHTML=html;
